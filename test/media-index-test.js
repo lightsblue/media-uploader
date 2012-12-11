@@ -3,6 +3,7 @@ var assert = require('assert'),
   fs = require('fs'),
   crypto = require('crypto'),
   MediaIndex = require('../lib/media-index'),
+  MockDestination = require('./mock-destination'),
   expect = require('expect.js');
 
 describe('MediaIndex', function () {
@@ -32,10 +33,11 @@ describe('MediaIndex', function () {
     });
 
     it('should filter hashes that do not need uploading', function () {
-      var t = new MediaIndex(index);
+      var t = new MediaIndex(null, new MockDestination(index));
       t.filterPreviouslyUploaded(localHashToFile);
       expect(localHashToFile).to.only.have.keys(['6847fee1d215fddc4523fb972db70b24', '3b3add2bed1dea37d63fa6fc5a24660d']);
     });
+
   });
 
 });

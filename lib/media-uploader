@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var program = require('commander'),
+  fs = require('fs'),
+  s3Cfg,
+  MediaTree = require('./media-tree'),
+  MediaIndex = require('./media-index'),
+  //S3Destination = require('./s3-destination'),
+  S3Destination = require('../test/mock-destination'),
+  hashToFile,
+  t,
+  i;
+
+program
+  .usage('media-uploader <source> <destination>')
+  .parse(process.argv);
+
+console.log('uploading from ' + program.args[0] + ' to S3 Configuration ' + program.args[1]);
+var data = fs.readFileSync(program.args[1]);
+s3Cfg = JSON.parse(data);
+
+////////////////////////////////////////////////////////////////////////////////
+
+t = new MediaTree(program.args[0]),
+i = new MediaIndex(t, new S3Destination()),
+i.uploadUnindexed().then(function (sync) {
+  console.log(sync.media + ' media uploaded');
+}, function (err) {
+  console.error(err);
+}, function (progress) {
+  console.log('progress: ', progress);
+});
